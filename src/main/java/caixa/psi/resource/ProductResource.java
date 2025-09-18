@@ -2,7 +2,6 @@ package caixa.psi.resource;
 
 import caixa.psi.dto.CreateProductDTO;
 import caixa.psi.service.ProductService;
-import jakarta.decorator.Delegate;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

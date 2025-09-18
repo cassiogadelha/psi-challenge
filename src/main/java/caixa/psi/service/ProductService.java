@@ -8,6 +8,7 @@ import caixa.psi.repository.ProductDAO;
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.sql.Update;
 
@@ -76,6 +77,14 @@ public class ProductService {
     @Transactional
     public Response updateProduct(UUID id, UpdateProductDTO dto){
         return Response.ok().build();
+    }
+
+    public Product getProduct(UUID productId) {
+        Product product = productDAO.findById(productId);
+
+        if(product == null) throw new NotFoundException();
+
+        return product;
     }
 
 }
