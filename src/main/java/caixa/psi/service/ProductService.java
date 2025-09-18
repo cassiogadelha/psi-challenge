@@ -39,7 +39,7 @@ public class ProductService {
         return Response.ok(productMapper.toResponseList(products)).build();
     }
 
-    public Response getById(UUID id) {
+    public Response findById(UUID id) {
         Product product = productDAO.findById(id);
 
         if(product == null) return Response.status(404).build();

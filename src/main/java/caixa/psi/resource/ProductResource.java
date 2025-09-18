@@ -1,9 +1,13 @@
 package caixa.psi.resource;
 
+import caixa.psi.dto.CreateProductDTO;
 import caixa.psi.service.ProductService;
+import jakarta.decorator.Delegate;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.UUID;
 
 @Path("/api/v1/product")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -21,5 +25,28 @@ public class ProductResource {
                                    @QueryParam("size") @DefaultValue("10") int size){
 
         return productService.getAllProducts(page, size);
+    }
+
+    @GET
+    @Path("{id}")
+    public Response findById(@PathParam("id") UUID id) {
+
+        return productService.findById(id);
+
+    }
+
+    @POST
+    public Response createProduct(CreateProductDTO dto) {
+
+        return productService.createProduct(dto);
+
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response deleteProduct(UUID id){
+
+        return productService.deleteProduct(id);
+
     }
 }

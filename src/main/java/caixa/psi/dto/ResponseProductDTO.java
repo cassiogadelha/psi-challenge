@@ -1,6 +1,11 @@
 package caixa.psi.dto;
 
-public record ResponseProductDTO(
+import java.util.UUID;
 
+public record ResponseProductDTO(
+    UUID id,
+    String name,
+    float annualInterestRate,
+    int maxInstallments
 ) {
 }
