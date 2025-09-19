@@ -48,40 +48,46 @@ public class LoanService {
 
     private Response createLoanData(RequestLoanDataDTO dto) {
 
-        BigDecimal annualInterestRate = productService.getProduct(dto.productId()).getAnnualInterestRate();
-        Log.info("ANNUAL INTEREST RATE: " + annualInterestRate);
-        BigDecimal monthlyRate = annualInterestRate.divide(BigDecimal.valueOf(100 * 12), 2, RoundingMode.HALF_UP);
-        float monthlyInterestRate = monthlyRate.floatValue();
+        Product product = productService.getProduct(dto.productId());
 
-        Log.info("MONTHLY RATE: " + monthlyRate);
+        BigDecimal annualInterestRate = product.getAnnualInterestRate();
+        BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100 * 12), 3, RoundingMode.HALF_UP);
 
-        BigDecimal compoundFactor = BigDecimal.valueOf(Math.pow((1 + monthlyInterestRate), dto.requestedInstallments()));
+        BigDecimal installment = generateInstallment(monthlyInterestRate, dto);
+        BigDecimal totalLoanValue = installment.multiply(BigDecimal.valueOf(dto.requestedInstallments()));
+
+        ResponseLoanDataDTO loanDataDTO = new ResponseLoanDataDTO(
+            product,
+            dto.requestedSum().setScale(2, RoundingMode.HALF_UP),
+            dto.requestedInstallments(),
+            generateEffectiveMonthlyInterestRate(annualInterestRate),
+            totalLoanValue.setScale(2, RoundingMode.HALF_UP),
+            installment.setScale(2, RoundingMode.HALF_UP),
+            generateCalculationMemory(monthlyInterestRate, dto, installment)
+        );
+
+        return Response.ok(loanDataDTO).build();
+    }
+
+    private BigDecimal generateInstallment(BigDecimal monthlyInterestRate, RequestLoanDataDTO dto) {
+
+        BigDecimal compoundFactor = BigDecimal.valueOf(Math.pow((1.0 + monthlyInterestRate.doubleValue()), dto.requestedInstallments()));
+        BigDecimal numerator = monthlyInterestRate.multiply(compoundFactor);
+        BigDecimal denominator = compoundFactor.subtract(BigDecimal.ONE);
+        return dto.requestedSum().multiply(numerator.divide(denominator, RoundingMode.HALF_UP));
+
+    }
+
+    private List<CalculationMemoryUnity> generateCalculationMemory(BigDecimal monthlyInterestRate, RequestLoanDataDTO dto, BigDecimal installment){
 
         BigDecimal initialLoanBalance = dto.requestedSum();
         BigDecimal finalLoanBalance;
 
-        BigDecimal effectiveMonthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
-                .add(BigDecimal.valueOf(1));
-        effectiveMonthlyInterestRate = BigDecimal.valueOf((Math.pow(effectiveMonthlyInterestRate.doubleValue(), (1.0 / 12.0))) - 1);
-        Log.info("EFFECTIVE MONTHLY INTEREST RATE: " + effectiveMonthlyInterestRate);
-
-
-        Log.info("COMPOUND: " + compoundFactor);
-        BigDecimal numerator = monthlyRate.multiply(compoundFactor);
-        Log.info("NUMERATOR: " + numerator);
-        BigDecimal denominator = compoundFactor.subtract(BigDecimal.ONE);
-        Log.info("DENOMINATOR: " + denominator);
-        BigDecimal installment = dto.requestedSum().multiply(numerator.divide(denominator, RoundingMode.HALF_UP));
-        Log.info("INSTALLMENT: " + installment);
-
-        BigDecimal totalLoanValue = installment.multiply(BigDecimal.valueOf(dto.requestedInstallments()));
-
         List<CalculationMemoryUnity> calculationMemory = new ArrayList<>();
 
-        BigDecimal interest = initialLoanBalance.multiply(BigDecimal.valueOf(monthlyInterestRate));
-        Log.info("INTEREST: " + interest);
+        BigDecimal interest = initialLoanBalance.multiply(monthlyInterestRate);
         BigDecimal amortization = installment.subtract(interest);
-        Log.info("AMORTIZATION: " + amortization);
+
         for (int i = 1; i <= dto.requestedInstallments(); i ++) {
 
             finalLoanBalance = initialLoanBalance.subtract(amortization);
@@ -102,21 +108,19 @@ public class LoanService {
             calculationMemory.add(unity);
 
             initialLoanBalance = finalLoanBalance;
-            interest = initialLoanBalance.multiply(BigDecimal.valueOf(monthlyInterestRate));
+            interest = initialLoanBalance.multiply(monthlyInterestRate);
             amortization = installment.subtract(interest);
         }
 
-        Product product = productService.getProduct(dto.productId());
-        ResponseLoanDataDTO loanDataDTO = new ResponseLoanDataDTO(
-            product,
-            dto.requestedSum().setScale(2, RoundingMode.HALF_UP),
-            dto.requestedInstallments(),
-            effectiveMonthlyInterestRate,
-            totalLoanValue.setScale(2, RoundingMode.HALF_UP),
-            installment.setScale(2, RoundingMode.HALF_UP),
-            calculationMemory
-        );
+        return calculationMemory;
+    }
 
-        return Response.ok(loanDataDTO).build();
+    private BigDecimal generateEffectiveMonthlyInterestRate(BigDecimal annualInterestRate) {
+
+        BigDecimal effectiveMonthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
+                .add(BigDecimal.valueOf(1));
+
+        return BigDecimal.valueOf((Math.pow(effectiveMonthlyInterestRate.doubleValue(), (1.0 / 12.0))) - 1);
+
     }
 }
