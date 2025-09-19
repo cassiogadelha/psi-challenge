@@ -5,16 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalculationMemory {
+public class CalculationMemoryUnity {
 
     int month;
-    float initialLoanBalance;
-    float interestRate;
-    float amortization;
-    float finalLoanBalance;
+    BigDecimal initialLoanBalance;
+    BigDecimal interest;
+    BigDecimal amortization;
+    BigDecimal finalLoanBalance;
 
 }

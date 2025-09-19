@@ -1,17 +1,20 @@
 package caixa.psi.dto;
 
 import caixa.psi.entity.Product;
-import jakarta.validation.constraints.NotNull;
+import caixa.psi.model.CalculationMemoryUnity;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public record ResponseLoanDataDTO(
 
         Product product,
-        float requestedSum,
+        BigDecimal requestedSum,
         int requestedInstallment,
-        float effectiveMonthlyInterestRate,
-        float totalLoanValue,
-        float monthlyInstallment
-
+        BigDecimal effectiveMonthlyInterestRate,
+        BigDecimal totalLoanValue,
+        BigDecimal monthlyInstallment,
+        List<CalculationMemoryUnity> calculationMemory
 
 ) {
 }

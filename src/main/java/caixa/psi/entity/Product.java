@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -22,6 +23,6 @@ public class Product extends PanacheEntityBase {
     UUID id;
 
     String name;
-    float annualInterestRate;
+    BigDecimal annualInterestRate;
     short maxInstallments;
 }

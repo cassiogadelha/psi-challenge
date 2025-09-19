@@ -2,6 +2,7 @@ package caixa.psi.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record RequestLoanDataDTO(
@@ -9,7 +10,7 @@ public record RequestLoanDataDTO(
         UUID productId,
 
         @NotNull(message = "Informe o valor desejado.")
-        float requestedSum,
+        BigDecimal requestedSum,
 
         @NotNull(message = "Informe o prazo desejado.")
         int requestedInstallments
