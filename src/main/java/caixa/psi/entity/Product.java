@@ -25,4 +25,10 @@ public class Product extends PanacheEntityBase {
     String name;
     BigDecimal annualInterestRate;
     short maxInstallments;
+
+    public Product(String name, BigDecimal annualInterestRate, short maxInstallments) {
+        this.name = name;
+        this.annualInterestRate = annualInterestRate;
+        this.maxInstallments = maxInstallments;
+    }
 }

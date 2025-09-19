@@ -1,11 +1,12 @@
 package caixa.psi.dto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ResponseProductDTO(
     UUID id,
     String name,
-    float annualInterestRate,
+    BigDecimal annualInterestRate,
     int maxInstallments
 ) {
 }

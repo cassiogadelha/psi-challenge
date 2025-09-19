@@ -43,7 +43,10 @@ public class ProductService {
     public Response findById(UUID id) {
         Product product = productDAO.findById(id);
 
-        if(product == null) return Response.status(404).build();
+        if(product == null) {
+            Map<String, String> response = Map.of("mensagem", "Produto não encontrado!");
+            return Response.status(Response.Status.NOT_FOUND).entity(response).build();
+        }
 
         return Response.ok(productMapper.toResponse(product)).build();
     }
@@ -67,7 +70,10 @@ public class ProductService {
 
         Product product = productDAO.findById(id);
 
-        if(product == null) return Response.status(404).build();
+        if(product == null) {
+            Map<String, String> response = Map.of("mensagem", "Produto não encontrado!");
+            return Response.status(Response.Status.NOT_FOUND).entity(response).build();
+        }
 
         productDAO.delete(product);
 
