@@ -1,6 +1,8 @@
 package caixa.psi.resource;
 
 import caixa.psi.dto.CreateProductDTO;
+import caixa.psi.dto.PatchProductDTO;
+import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.service.ProductService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -43,9 +45,25 @@ public class ProductResource {
 
     @DELETE
     @Path("{id}")
-    public Response deleteProduct(UUID id){
+    public Response deleteProduct(@PathParam("id") UUID id){
 
         return productService.deleteProduct(id);
+
+    }
+
+    @PUT
+    @Path("{id}")
+    public Response updateProduct(@PathParam("id") UUID id, UpdateProductDTO dto) {
+
+        return productService.updateProduct(id, dto);
+
+    }
+
+    @PATCH
+    @Path("{id}")
+    public Response patchProduct(@PathParam("id") UUID id, PatchProductDTO dto) {
+
+        return productService.patchProduct(id, dto);
 
     }
 }

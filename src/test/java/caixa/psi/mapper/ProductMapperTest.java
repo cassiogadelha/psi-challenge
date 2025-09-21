@@ -2,6 +2,7 @@ package caixa.psi.mapper;
 
 import caixa.psi.dto.CreateProductDTO;
 import caixa.psi.dto.ResponseProductDTO;
+import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.entity.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,21 @@ public class ProductMapperTest {
     void shouldConvertCreateProductDTOToEntity() {
 
         CreateProductDTO dto = new CreateProductDTO("CDC", new BigDecimal(67), (short)45);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Product product = productMapper.toEntity(dto);
+
+            Assertions.assertEquals(dto.name(), product.getName());
+            Assertions.assertEquals(dto.annualInterestRate(), product.getAnnualInterestRate());
+            Assertions.assertEquals(dto.maxInstallments(), product.getMaxInstallments());
+        });
+
+    }
+
+    @Test
+    void shouldConvertUpdateProductDTOToEntity() {
+
+        UpdateProductDTO dto = new UpdateProductDTO("CDC", new BigDecimal(67), (short)45);
 
         Assertions.assertDoesNotThrow(() -> {
             Product product = productMapper.toEntity(dto);

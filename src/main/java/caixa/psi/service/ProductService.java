@@ -1,6 +1,7 @@
 package caixa.psi.service;
 
 import caixa.psi.dto.CreateProductDTO;
+import caixa.psi.dto.PatchProductDTO;
 import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.entity.Product;
 import caixa.psi.mapper.ProductMapper;
@@ -13,6 +14,7 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.sql.Update;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ public class ProductService {
 
         productDAO.persist(newProduct);
 
-        URI location = URI.create("/api/v1/bookings/" + newProduct.getId());
+        URI location = URI.create("/api/v1/product/" + newProduct.getId());
 
         return Response.created(location)
                 .entity(productMapper.toResponse(newProduct))
@@ -81,8 +83,49 @@ public class ProductService {
         return Response.noContent().build();
     }
 
+    @Transactional
     public Response updateProduct(UUID id, UpdateProductDTO dto){
-        return Response.ok().build();
+
+        Product product = productDAO.findById(id);
+
+        if (product == null) {
+            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
+            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
+        }
+
+        product = productMapper.toEntity(dto);
+
+        productDAO.persist(product);
+
+        return Response.ok(productMapper.toResponse(product)).build();
+    }
+
+    @Transactional
+    public Response patchProduct(UUID id, PatchProductDTO dto) {
+
+        Product product = productDAO.findById(id);
+
+        if (product == null) {
+            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
+            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
+        }
+
+        if (dto.name() != null && !dto.name().isBlank()) {
+            product.setName(dto.name());
+        }
+
+        if (dto.annualInterestRate() != null && dto.annualInterestRate().longValue() > 0.0) {
+            product.setAnnualInterestRate(dto.annualInterestRate());
+        }
+
+        if (dto.maxInstallments() > 0) {
+            product.setMaxInstallments(dto.maxInstallments());
+        }
+
+        productDAO.persist(product);
+
+        return Response.ok(productMapper.toResponse(product)).build();
+
     }
 
     public Product getProduct(UUID productId) {

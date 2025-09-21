@@ -1,20 +1,19 @@
 package caixa.psi.service;
 
 import caixa.psi.dto.CreateProductDTO;
+import caixa.psi.dto.PatchProductDTO;
 import caixa.psi.dto.ResponseProductDTO;
+import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.entity.Product;
 import caixa.psi.mapper.ProductMapper;
 import caixa.psi.repository.ProductDAO;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Page;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
-import org.apache.groovy.json.internal.Exceptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
@@ -23,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static io.restassured.RestAssured.when;
 import static org.mockito.Mockito.mock;
 
 public class ProductServiceTest {
@@ -213,4 +211,209 @@ public class ProductServiceTest {
         });
 
     }
+
+    @Test
+    void shouldUpdateProductSuccessfully() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        UpdateProductDTO fakeUpdate = new UpdateProductDTO("CDC", new BigDecimal("40.0"), (short) 36);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakeUpdate.name(),
+                fakeUpdate.annualInterestRate(),
+                fakeUpdate.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+        Mockito.when(productMapper.toEntity(Mockito.any(UpdateProductDTO.class))).thenReturn(fakeProduct);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.updateProduct(UUID.randomUUID(), fakeUpdate);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldFailUpdateWhenProductDoesNotExist() {
+
+        UpdateProductDTO fakeUpdate = new UpdateProductDTO("CDC", new BigDecimal("40.0"), (short) 36);
+
+        Response response = productService.updateProduct(UUID.randomUUID(), fakeUpdate);
+
+        Assertions.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+
+    }
+
+    @Test
+    void shouldPatchProductSuccessfully() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("CDC", new BigDecimal("40.0"), (short) 36);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakePatch.annualInterestRate(),
+                fakePatch.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenNameIsNotProvided() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("", new BigDecimal("40.0"), (short) 36);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakeProduct.getName(),
+                fakePatch.annualInterestRate(),
+                fakePatch.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenAnnualInterestRateIsNotProvided() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("Financiamento", null, (short) 36);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakeProduct.getAnnualInterestRate(),
+                fakePatch.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenAnnualInterestRateIsZero() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("Financiamento", new BigDecimal("0.0"), (short) 36);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakeProduct.getAnnualInterestRate(),
+                fakePatch.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenMaxInstallmentsIsNotProvided() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("Financiamento", new BigDecimal("40.0"), (short) 0);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakePatch.annualInterestRate(),
+                fakeProduct.getMaxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenMaxInstallmentsIsNegative() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("Financiamento", new BigDecimal("40.0"), (short) -8);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakePatch.annualInterestRate(),
+                fakeProduct.getMaxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
+    @Test
+    void shouldPatchProductCorrectlyWhenAnnualInterestRateIsNegative() {
+
+        Product fakeProduct = new Product(UUID.randomUUID(), "CDC", new BigDecimal("57.0"), (short) 48);
+        PatchProductDTO fakePatch = new PatchProductDTO("Financiamento", new BigDecimal("-7.0"), (short) 45);
+
+        ResponseProductDTO fakeResponseDTO = new ResponseProductDTO(
+                fakeProduct.getId(),
+                fakePatch.name(),
+                fakeProduct.getAnnualInterestRate(),
+                fakePatch.maxInstallments()
+        );
+
+        Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productMapper.toResponse(Mockito.any(Product.class))).thenReturn(fakeResponseDTO);
+
+        Assertions.assertDoesNotThrow(() -> {
+            Response response = productService.patchProduct(UUID.randomUUID(), fakePatch);
+            Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assertions.assertEquals(fakeResponseDTO, response.getEntity());
+        });
+
+    }
+
 }

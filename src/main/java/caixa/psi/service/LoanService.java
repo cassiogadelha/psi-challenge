@@ -3,7 +3,6 @@ package caixa.psi.service;
 import caixa.psi.dto.RequestLoanDataDTO;
 import caixa.psi.dto.ResponseLoanDataDTO;
 import caixa.psi.entity.Product;
-import caixa.psi.utils.EffectiveMonthlyRateCalculator;
 import caixa.psi.utils.InstallmentGenerator;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,11 +34,11 @@ public class LoanService {
             return Response.status(Response.Status.CONFLICT).entity(message).build();
         }
 
-        return createLoanData(dto);
+        return Response.ok(createLoanData(dto)).build();
 
     }
 
-    private Response createLoanData(RequestLoanDataDTO dto) {
+    private ResponseLoanDataDTO createLoanData(RequestLoanDataDTO dto) {
 
         Product product = productService.getProduct(dto.productId());
 
@@ -52,7 +51,7 @@ public class LoanService {
         BigDecimal totalLoanValue = installment.multiply(BigDecimal.valueOf(dto.requestedInstallments()));
 
 
-        ResponseLoanDataDTO loanDataDTO = new ResponseLoanDataDTO(
+        return new ResponseLoanDataDTO(
             product,
             dto.requestedSum().setScale(2, RoundingMode.HALF_UP),
             dto.requestedInstallments(),
@@ -62,7 +61,6 @@ public class LoanService {
             generateCalculationMemory(monthlyInterestRate, dto, installment)
         );
 
-        return Response.ok(loanDataDTO).build();
     }
 
     private boolean checkMaxInstallment(UUID productId, int requestedProductInstallment) {
