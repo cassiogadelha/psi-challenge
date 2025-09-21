@@ -1,6 +1,7 @@
 package caixa.psi.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -10,6 +11,7 @@ public record UpdateProductDTO(
 
         @NotNull(message = "Informe um nome para o produto.")
         @NotBlank(message = "Informe um nome válido para o produto.")
+        @NotEmpty(message = "Informe um nome válido para o produto.")
         String name,
 
         @Positive(message = "Informe um valor positivo.")

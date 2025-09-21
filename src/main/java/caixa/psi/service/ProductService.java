@@ -93,9 +93,9 @@ public class ProductService {
             return Response.status(Response.Status.NOT_FOUND).entity(message).build();
         }
 
-        product = productMapper.toEntity(dto);
-
-        productDAO.persist(product);
+        product.setName(dto.name());
+        product.setAnnualInterestRate(dto.annualInterestRate());
+        product.setMaxInstallments(dto.maxInstallments());
 
         return Response.ok(productMapper.toResponse(product)).build();
     }
@@ -121,8 +121,6 @@ public class ProductService {
         if (dto.maxInstallments() > 0) {
             product.setMaxInstallments(dto.maxInstallments());
         }
-
-        productDAO.persist(product);
 
         return Response.ok(productMapper.toResponse(product)).build();
 

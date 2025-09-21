@@ -4,6 +4,7 @@ import caixa.psi.dto.CreateProductDTO;
 import caixa.psi.dto.PatchProductDTO;
 import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.service.ProductService;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -37,7 +38,7 @@ public class ProductResource {
     }
 
     @POST
-    public Response createProduct(CreateProductDTO dto) {
+    public Response createProduct(@Valid CreateProductDTO dto) {
 
         return productService.createProduct(dto);
 
@@ -53,7 +54,7 @@ public class ProductResource {
 
     @PUT
     @Path("{id}")
-    public Response updateProduct(@PathParam("id") UUID id, UpdateProductDTO dto) {
+    public Response updateProduct(@PathParam("id") UUID id, @Valid UpdateProductDTO dto) {
 
         return productService.updateProduct(id, dto);
 
