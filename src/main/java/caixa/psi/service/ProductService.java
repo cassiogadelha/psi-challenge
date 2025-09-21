@@ -5,6 +5,7 @@ import caixa.psi.dto.UpdateProductDTO;
 import caixa.psi.entity.Product;
 import caixa.psi.mapper.ProductMapper;
 import caixa.psi.repository.ProductDAO;
+import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -71,8 +72,8 @@ public class ProductService {
         Product product = productDAO.findById(id);
 
         if(product == null) {
-            Map<String, String> response = Map.of("mensagem", "Produto não encontrado!");
-            return Response.status(Response.Status.NOT_FOUND).entity(response).build();
+            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
+            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
         }
 
         productDAO.delete(product);
@@ -80,7 +81,6 @@ public class ProductService {
         return Response.noContent().build();
     }
 
-    @Transactional
     public Response updateProduct(UUID id, UpdateProductDTO dto){
         return Response.ok().build();
     }
