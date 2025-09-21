@@ -40,7 +40,7 @@ public class LoanService {
 
     private ResponseLoanDataDTO createLoanData(RequestLoanDataDTO dto) {
 
-        Product product = productService.getProduct(dto.productId());
+        Product product = productService.checkIfProductExists(dto.productId());
 
         BigDecimal annualInterestRate = product.getAnnualInterestRate();
         BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100 * 12), 6, RoundingMode.HALF_UP);
@@ -68,7 +68,7 @@ public class LoanService {
         int productMaxInstallment;
 
         try {
-            productMaxInstallment = productService.getProduct(productId).getMaxInstallments();
+            productMaxInstallment = productService.checkIfProductExists(productId).getMaxInstallments();
 
             return requestedProductInstallment <= productMaxInstallment;
         } catch (Exception e) {

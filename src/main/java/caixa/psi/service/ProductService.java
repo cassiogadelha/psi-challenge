@@ -107,7 +107,7 @@ public class ProductService {
 
     }
 
-    private Product checkIfProductExists(UUID id) {
+    public Product checkIfProductExists(UUID id) {
 
         Product product = productDAO.findById(id);
 
@@ -128,13 +128,4 @@ public class ProductService {
     private Map<String, String> notFoundErrorMessage() {
         return Map.of("mensagem", "Produto não encontrado!");
     }
-
-    public Product getProduct(UUID productId) {
-        Product product = productDAO.findById(productId);
-
-        if(product == null) throw new NotFoundException();
-
-        return product;
-    }
-
 }

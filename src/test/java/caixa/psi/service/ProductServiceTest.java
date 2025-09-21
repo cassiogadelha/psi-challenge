@@ -201,7 +201,7 @@ public class ProductServiceTest {
 
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(product);
 
-        Assertions.assertEquals(productService.getProduct(UUID.randomUUID()), product);
+        Assertions.assertEquals(productService.checkIfProductExists(UUID.randomUUID()), product);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ProductServiceTest {
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(null);
 
         Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.getProduct(UUID.randomUUID());
+            productService.checkIfProductExists(UUID.randomUUID());
         });
 
     }

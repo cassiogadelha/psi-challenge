@@ -2,7 +2,6 @@ package caixa.psi.utils;
 
 import caixa.psi.dto.RequestLoanDataDTO;
 import caixa.psi.model.CalculationMemoryUnity;
-import io.quarkus.logging.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

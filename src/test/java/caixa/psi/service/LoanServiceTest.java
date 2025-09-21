@@ -3,7 +3,6 @@ package caixa.psi.service;
 import caixa.psi.dto.RequestLoanDataDTO;
 import caixa.psi.dto.ResponseLoanDataDTO;
 import caixa.psi.entity.Product;
-import caixa.psi.mapper.ProductMapper;
 import caixa.psi.model.CalculationMemoryUnity;
 import caixa.psi.repository.ProductDAO;
 import jakarta.ws.rs.core.Response;
@@ -20,14 +19,12 @@ import static org.mockito.Mockito.mock;
 
 public class LoanServiceTest {
 
-    private ProductMapper productMapper;
     private ProductDAO productDAO;
     private ProductService productService;
     private LoanService loanService;
 
     @BeforeEach
     void setup() {
-        this.productMapper = mock(ProductMapper.class);
         this.productDAO = mock(ProductDAO.class);
         this.productService = mock(ProductService.class);
         this.loanService = new LoanService(productService);
@@ -39,7 +36,7 @@ public class LoanServiceTest {
         Product fakeProduct = new Product("Financiamento Habitacional", new BigDecimal("7.4"), (short) 5);
 
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
-        Mockito.when(productService.getProduct(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productService.checkIfProductExists(Mockito.any(UUID.class))).thenReturn(fakeProduct);
 
         RequestLoanDataDTO dto = new RequestLoanDataDTO(
             UUID.randomUUID(),
@@ -63,7 +60,7 @@ public class LoanServiceTest {
         Product fakeProduct = new Product(UUID.randomUUID(), "Financiamento Habitacional", new BigDecimal("7.4"), (short) 420);
 
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(fakeProduct);
-        Mockito.when(productService.getProduct(Mockito.any(UUID.class))).thenReturn(fakeProduct);
+        Mockito.when(productService.checkIfProductExists(Mockito.any(UUID.class))).thenReturn(fakeProduct);
 
         RequestLoanDataDTO requestDTO = new RequestLoanDataDTO(
                 UUID.randomUUID(),

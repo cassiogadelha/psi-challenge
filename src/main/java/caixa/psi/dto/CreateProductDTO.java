@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record CreateProductDTO(
+
         @NotNull(message = "Informe um nome para o produto.")
         String name,
 
