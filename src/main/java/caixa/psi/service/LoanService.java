@@ -43,10 +43,9 @@ public class LoanService {
         Product product = productService.checkIfProductExists(dto.productId());
 
         BigDecimal annualInterestRate = product.getAnnualInterestRate();
-        BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100 * 12), 6, RoundingMode.HALF_UP);
+        BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100 * 12), 8, RoundingMode.HALF_UP);
 
-        BigDecimal installment = InstallmentGenerator.installmentCalculator(monthlyInterestRate, dto)
-                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal installment = InstallmentGenerator.installmentCalculator(monthlyInterestRate, dto);
 
         BigDecimal totalLoanValue = installment.multiply(BigDecimal.valueOf(dto.requestedInstallments()));
 

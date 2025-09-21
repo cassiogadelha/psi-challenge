@@ -74,8 +74,8 @@ public class LoanServiceTest {
                 new BigDecimal("50000.00"),
                 (short) 96,
                 new BigDecimal("0.005967"),
-                new BigDecimal("66402.24"),
-                new BigDecimal("691.69"),
+                new BigDecimal("66401.42"),
+                new BigDecimal("691.68"),
                 calculationMemoryUnityList
         );
 

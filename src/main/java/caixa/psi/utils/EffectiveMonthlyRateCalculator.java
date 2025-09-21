@@ -9,7 +9,7 @@ public class EffectiveMonthlyRateCalculator {
 
     public static BigDecimal calculateEffectiveMonthlyRate(BigDecimal annualInterestRate) {
 
-        BigDecimal effectiveAnnualInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100.0), 4, RoundingMode.HALF_UP);
+        BigDecimal effectiveAnnualInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100.0), 5, RoundingMode.HALF_UP);
 
         double convertedInterestRate = effectiveAnnualInterestRate.add(BigDecimal.valueOf(1.0)).doubleValue();
 
