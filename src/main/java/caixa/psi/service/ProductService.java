@@ -44,12 +44,8 @@ public class ProductService {
     }
 
     public Response findById(UUID id) {
-        Product product = productDAO.findById(id);
 
-        if(product == null) {
-            Map<String, String> response = Map.of("mensagem", "Produto não encontrado!");
-            return Response.status(Response.Status.NOT_FOUND).entity(response).build();
-        }
+        Product product = checkIfProductExists(id);
 
         return Response.ok(productMapper.toResponse(product)).build();
     }
@@ -71,12 +67,7 @@ public class ProductService {
     @Transactional
     public Response deleteProduct(UUID id){
 
-        Product product = productDAO.findById(id);
-
-        if(product == null) {
-            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
-            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
-        }
+        Product product = checkIfProductExists(id);
 
         productDAO.delete(product);
 
@@ -86,12 +77,7 @@ public class ProductService {
     @Transactional
     public Response updateProduct(UUID id, UpdateProductDTO dto){
 
-        Product product = productDAO.findById(id);
-
-        if (product == null) {
-            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
-            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
-        }
+        Product product = checkIfProductExists(id);
 
         product.setName(dto.name());
         product.setAnnualInterestRate(dto.annualInterestRate());
@@ -103,12 +89,7 @@ public class ProductService {
     @Transactional
     public Response patchProduct(UUID id, PatchProductDTO dto) {
 
-        Product product = productDAO.findById(id);
-
-        if (product == null) {
-            Map<String, String> message = Map.of("mensagem", "Produto não encontrado!");
-            return Response.status(Response.Status.NOT_FOUND).entity(message).build();
-        }
+        Product product = checkIfProductExists(id);
 
         if (dto.name() != null && !dto.name().isBlank()) {
             product.setName(dto.name());
@@ -124,6 +105,28 @@ public class ProductService {
 
         return Response.ok(productMapper.toResponse(product)).build();
 
+    }
+
+    private Product checkIfProductExists(UUID id) {
+
+        Product product = productDAO.findById(id);
+
+        if (product == null) {
+
+            Response response = Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity(notFoundErrorMessage())
+                    .build();
+
+            throw new NotFoundException(response);
+        }
+
+        return product;
+
+    }
+
+    private Map<String, String> notFoundErrorMessage() {
+        return Map.of("mensagem", "Produto não encontrado!");
     }
 
     public Product getProduct(UUID productId) {

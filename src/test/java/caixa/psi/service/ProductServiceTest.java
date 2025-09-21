@@ -114,10 +114,12 @@ public class ProductServiceTest {
 
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(null);
 
-        Response response = productService.findById(UUID.randomUUID());
+        Assertions.assertThrows(NotFoundException.class, () -> {
 
-        Assertions.assertEquals(404, response.getStatus());
-        Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+            Response response = productService.findById(UUID.randomUUID());
+            Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+
+        });
 
     }
 
@@ -185,10 +187,11 @@ public class ProductServiceTest {
 
         Mockito.when(productDAO.findById(Mockito.any(UUID.class))).thenReturn(null);
 
-        Response response = productService.deleteProduct(UUID.randomUUID());
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            Response response = productService.deleteProduct(UUID.randomUUID());
+            Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+        });
 
-        Assertions.assertEquals(404, response.getStatus());
-        Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
     }
 
     @Test
@@ -242,10 +245,10 @@ public class ProductServiceTest {
 
         UpdateProductDTO fakeUpdate = new UpdateProductDTO("CDC", new BigDecimal("40.0"), (short) 36);
 
-        Response response = productService.updateProduct(UUID.randomUUID(), fakeUpdate);
-
-        Assertions.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-        Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            Response response = productService.updateProduct(UUID.randomUUID(), fakeUpdate);
+            Assertions.assertTrue(response.getEntity().toString().contains("Produto não encontrado!"));
+        });
 
     }
 
